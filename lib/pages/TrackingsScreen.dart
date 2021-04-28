@@ -1,4 +1,5 @@
-import 'package:AlkometerApp/components/BottomNavigation.dart';
+import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
+import 'package:AlkometerApp/components/HeaderComponent.dart';
 import 'package:flutter/material.dart';
 
 class TrackingScreen extends StatefulWidget {
@@ -18,11 +19,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
       ),
       body: SafeArea(
         child: Column(
-          children: [
-            Text(
-              "This is the TrackingScreen",
-            ),
-          ],
+          children: [HeaderComponent(icon: Icons.bar_chart, title: "Data", color: Colors.blue)],
         ),
       ),
     );

@@ -1,4 +1,5 @@
-import 'package:AlkometerApp/components/BottomNavigation.dart';
+import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
+import 'package:AlkometerApp/components/HeaderComponent.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,13 +17,23 @@ class _HomeScreenState extends State<HomeScreen> {
         currentPage: 1,
         context: context,
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Text(
-              "This is the HomeScreen",
-            ),
-          ],
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.blue,
+              Colors.green,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [],
+          ),
         ),
       ),
     );
