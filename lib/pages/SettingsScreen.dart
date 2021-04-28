@@ -38,10 +38,35 @@ class _SettingScreenState extends State<SettingScreen> {
     // TODO: implement initState
     super.initState();
 
-    asyncMethod();
+    // Get current state
+    FlutterBluetoothSerial.instance.state.then((state) {
+      setState(() {
+        _bluetoothState = state;
+      });
+    });
+
+    _deviceState = 0; // neutral
+
+    // If the bluetooth of the device is not enabled,
+    // then request permission to turn on bluetooth
+    // as the app starts up
+    enableBluetooth();
+
+    // Listen for further state changes
+    FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
+      setState(() {
+        _bluetoothState = state;
+        if (_bluetoothState == BluetoothState.STATE_OFF) {
+          _isButtonUnavailable = true;
+        }
+        asyncGetPairedDevices();
+      });
+    });
+
+    asyncGetPairedDevices();
   }
 
-  void asyncMethod() async {
+  void asyncGetPairedDevices() async {
     _devicesList = await myBlue.getPairedDevices();
   }
 
@@ -76,6 +101,47 @@ class _SettingScreenState extends State<SettingScreen> {
                     children: [
                       Container(
                         margin: EdgeInsets.only(top: 25.0),
+                        child: Text(
+                          "Bluetooth Status:",
+                          style: TextStyle(
+                            fontSize: 25.0,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 35.0, right: 35.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text("Enable Bluetooth:"),
+                            Switch(
+                              value: _bluetoothState.isEnabled,
+                              onChanged: (bool value) {
+                                future() async {
+                                  if (value) {
+                                    await FlutterBluetoothSerial.instance.requestEnable();
+                                  } else {
+                                    await FlutterBluetoothSerial.instance.requestDisable();
+                                  }
+
+                                  await myBlue.getPairedDevices();
+                                  _isButtonUnavailable = false;
+
+                                  if (_connected) {
+                                    _disconnect();
+                                  }
+                                }
+
+                                future().then((_) {
+                                  setState(() {});
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 20.0),
                         child: Text(
                           "Paired Device:",
                           style: TextStyle(
@@ -203,5 +269,22 @@ class _SettingScreenState extends State<SettingScreen> {
         _isButtonUnavailable = false;
       });
     }
+  }
+
+  // Request Bluetooth permission from the user
+  Future<void> enableBluetooth() async {
+    // Retrieving the current Bluetooth state
+    _bluetoothState = await FlutterBluetoothSerial.instance.state;
+
+    // If the bluetooth is off, then turn it on first
+    // and then retrieve the devices that are paired.
+    if (_bluetoothState == BluetoothState.STATE_OFF) {
+      await FlutterBluetoothSerial.instance.requestEnable();
+      await myBlue.getPairedDevices();
+      return true;
+    } else {
+      await myBlue.getPairedDevices();
+    }
+    return false;
   }
 }
