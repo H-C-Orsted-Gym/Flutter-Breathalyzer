@@ -27,12 +27,8 @@ class _SettingScreenState extends State<SettingScreen> {
 
   List<BluetoothDevice> _devicesList = [];
   BluetoothDevice _device;
-  int _deviceState;
   bool isDisconnecting = false;
-  // To track whether the device is still connected to Bluetooth
-  bool get isConnected => connection != null && connection.isConnected;
   bool _connected = false;
-  bool _isButtonUnavailable = false;
 
   @override
   void initState() {
@@ -41,7 +37,6 @@ class _SettingScreenState extends State<SettingScreen> {
 
     // Get current state
     FlutterBluetoothSerial.instance.state.then((state) {
-      print(state);
       if (globals.currentConnection != null) {
         _connected = true;
       }
@@ -50,8 +45,6 @@ class _SettingScreenState extends State<SettingScreen> {
         _bluetoothState = state;
       });
     });
-
-    _deviceState = 0; // neutral
 
     // If the bluetooth of the device is not enabled,
     // then request permission to turn on bluetooth
@@ -64,12 +57,8 @@ class _SettingScreenState extends State<SettingScreen> {
         .listen((BluetoothState state) {
       setState(() {
         _bluetoothState = state;
-        if (_bluetoothState == BluetoothState.STATE_OFF) {
-          _isButtonUnavailable = true;
-        }
         if (globals.currentConnection != null) {
           _connected = true;
-          connection = globals.currentConnection;
         }
         asyncGetPairedDevices();
       });
@@ -142,7 +131,6 @@ class _SettingScreenState extends State<SettingScreen> {
                                   }
 
                                   await myBlue.getPairedDevices();
-                                  _isButtonUnavailable = false;
 
                                   if (_connected) {
                                     _disconnect();
@@ -198,11 +186,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               value: _devicesList.isNotEmpty ? _device : null,
                             ),
                             ElevatedButton(
-                              onPressed: _isButtonUnavailable
-                                  ? null
-                                  : _connected
-                                      ? _disconnect
-                                      : _connect,
+                              onPressed: _connected ? _disconnect : _connect,
                               child:
                                   Text(_connected ? 'Disconnect' : 'Connect'),
                             ),
@@ -240,58 +224,47 @@ class _SettingScreenState extends State<SettingScreen> {
 
   // Method to connect to bluetooth
   void _connect() async {
-    setState(() {
-      _isButtonUnavailable = true;
-    });
     if (_device == null) {
       print("No device selected");
     } else {
-      if (!isConnected) {
-        await BluetoothConnection.toAddress(_device.address)
-            .then((_connection) {
-          print('Connected to the device');
-          globals.currentConnection = _connection;
-          setState(() {
-            _connected = true;
-          });
-
-          connection.input.listen(null).onDone(() {
-            if (isDisconnecting) {
-              print('Disconnecting locally!');
-            } else {
-              print('Disconnected remotely!');
-            }
-            if (this.mounted) {
-              setState(() {});
-            }
-          });
-        }).catchError((error) {
-          print('Cannot connect, exception occurred');
-          print(error);
+      print("Hi");
+      await BluetoothConnection.toAddress(_device.address).then((_connection) {
+        print('Connected to the device');
+        globals.currentConnection = _connection;
+        setState(() {
+          _connected = true;
         });
-        print("Device connected");
 
-        setState(() => _isButtonUnavailable = false);
-      }
+        globals.currentConnection.input.listen(null).onDone(() {
+          if (isDisconnecting) {
+            print('Disconnecting locally!');
+          } else {
+            print('Disconnected remotely!');
+          }
+          if (this.mounted) {
+            setState(() {});
+          }
+        });
+      }).catchError((error) {
+        print('Cannot connect, exception occurred');
+        print(error);
+      });
+      print("Device connected");
+      print(globals.currentConnection);
     }
   }
 
   // Method to disconnect bluetooth
   void _disconnect() async {
-    setState(() {
-      _isButtonUnavailable = true;
-      _deviceState = 0;
-    });
-
+    print("Hi 2");
     await globals.currentConnection.close();
     globals.currentConnection = null;
     print("Device disconnected");
-    if (!connection.isConnected) {
-      setState(() {
-        _connected = false;
-        _isButtonUnavailable = false;
-      });
-    }
+    setState(() {
+      globals.currentConnection = null;
+      _connected = false;
+      print(_connected);
+    });
   }
 
   // Request Bluetooth permission from the user
