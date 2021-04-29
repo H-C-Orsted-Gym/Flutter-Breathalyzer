@@ -36,9 +36,9 @@ Route createRoute(page) {
   );
 }
 
-void showMessage(GlobalKey<ScaffoldState> inputScaffoldKey, String inputMessage) {
+void showMessage(BuildContext buildContext, String inputMessage) {
   final snackBar = SnackBar(
     content: Text(inputMessage),
   );
-  inputScaffoldKey.currentState.showSnackBar(snackBar);
+  ScaffoldMessenger.of(buildContext).showSnackBar(snackBar);
 }

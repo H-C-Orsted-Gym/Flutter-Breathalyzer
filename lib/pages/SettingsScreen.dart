@@ -3,6 +3,7 @@ import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
 import 'package:AlkometerApp/components/HeaderComponent.dart';
 import 'package:AlkometerApp/components/SquareComponent.dart';
 import 'package:AlkometerApp/main.dart';
+import 'package:AlkometerApp/globals.dart' as globals;
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
@@ -40,6 +41,11 @@ class _SettingScreenState extends State<SettingScreen> {
 
     // Get current state
     FlutterBluetoothSerial.instance.state.then((state) {
+      print(state);
+      if (globals.currentConnection != null) {
+        _connected = true;
+      }
+
       setState(() {
         _bluetoothState = state;
       });
@@ -53,11 +59,17 @@ class _SettingScreenState extends State<SettingScreen> {
     enableBluetooth();
 
     // Listen for further state changes
-    FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
+    FlutterBluetoothSerial.instance
+        .onStateChanged()
+        .listen((BluetoothState state) {
       setState(() {
         _bluetoothState = state;
         if (_bluetoothState == BluetoothState.STATE_OFF) {
           _isButtonUnavailable = true;
+        }
+        if (globals.currentConnection != null) {
+          _connected = true;
+          connection = globals.currentConnection;
         }
         asyncGetPairedDevices();
       });
@@ -70,7 +82,7 @@ class _SettingScreenState extends State<SettingScreen> {
     _devicesList = await myBlue.getPairedDevices();
   }
 
-  @override
+  /*@override
   void dispose() {
     // Avoid memory leak and disconnect
     if (isConnected) {
@@ -80,7 +92,7 @@ class _SettingScreenState extends State<SettingScreen> {
     }
 
     super.dispose();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +104,10 @@ class _SettingScreenState extends State<SettingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            HeaderComponent(icon: Icons.settings, title: "Indstillinger", color: Colors.green),
+            HeaderComponent(
+                icon: Icons.settings,
+                title: "Indstillinger",
+                color: Colors.green),
             Container(
               margin: EdgeInsets.only(top: 25.0),
               child: SquareComponent(
@@ -119,9 +134,11 @@ class _SettingScreenState extends State<SettingScreen> {
                               onChanged: (bool value) {
                                 future() async {
                                   if (value) {
-                                    await FlutterBluetoothSerial.instance.requestEnable();
+                                    await FlutterBluetoothSerial.instance
+                                        .requestEnable();
                                   } else {
-                                    await FlutterBluetoothSerial.instance.requestDisable();
+                                    await FlutterBluetoothSerial.instance
+                                        .requestDisable();
                                   }
 
                                   await myBlue.getPairedDevices();
@@ -161,20 +178,23 @@ class _SettingScreenState extends State<SettingScreen> {
                             children: <TextSpan>[
                               TextSpan(
                                 text: _connected ? "Connected" : "Disconnected",
-                                style: TextStyle(color: _connected ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  color: _connected ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 35.0, right: 35.0),
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             DropdownButton(
                               items: _getDeviceItems(),
-                              onChanged: (value) => setState(() => _device = value),
+                              onChanged: (value) =>
+                                  setState(() => _device = value),
                               value: _devicesList.isNotEmpty ? _device : null,
                             ),
                             ElevatedButton(
@@ -183,7 +203,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                   : _connected
                                       ? _disconnect
                                       : _connect,
-                              child: Text(_connected ? 'Disconnect' : 'Connect'),
+                              child:
+                                  Text(_connected ? 'Disconnect' : 'Connect'),
                             ),
                           ],
                         ),
@@ -223,12 +244,13 @@ class _SettingScreenState extends State<SettingScreen> {
       _isButtonUnavailable = true;
     });
     if (_device == null) {
-      showMessage(_scaffoldKey, 'No device selected');
+      print("No device selected");
     } else {
       if (!isConnected) {
-        await BluetoothConnection.toAddress(_device.address).then((_connection) {
+        await BluetoothConnection.toAddress(_device.address)
+            .then((_connection) {
           print('Connected to the device');
-          connection = _connection;
+          globals.currentConnection = _connection;
           setState(() {
             _connected = true;
           });
@@ -247,7 +269,7 @@ class _SettingScreenState extends State<SettingScreen> {
           print('Cannot connect, exception occurred');
           print(error);
         });
-        showMessage(_scaffoldKey, 'Device connected');
+        print("Device connected");
 
         setState(() => _isButtonUnavailable = false);
       }
@@ -261,8 +283,9 @@ class _SettingScreenState extends State<SettingScreen> {
       _deviceState = 0;
     });
 
-    await connection.close();
-    showMessage(_scaffoldKey, 'Device disconnected');
+    await globals.currentConnection.close();
+    globals.currentConnection = null;
+    print("Device disconnected");
     if (!connection.isConnected) {
       setState(() {
         _connected = false;
