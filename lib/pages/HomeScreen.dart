@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
 import 'package:AlkometerApp/components/BreakLineComponent.dart';
 import 'package:AlkometerApp/components/CircleComponent.dart';
 import 'package:AlkometerApp/components/HeaderComponent.dart';
+import 'package:AlkometerApp/globals.dart' as globals;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +17,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String result = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    if (globals.currentConnection != null) {
+      globals.currentConnection.input.listen((Uint8List data) {
+        //Data entry point
+        print(ascii.decode(data));
+        setState(() {
+          this.result = ascii.decode(data).toString().trim();
+        });
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
               CircleComponent(
                 fillings: Center(
                   child: Text(
-                    "1.23",
+                    this.result,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 55.0,
@@ -89,12 +111,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 300,
                 child: LineChart(
                   LineChartData(
-                    minX: 0,
-                    maxX: 10,
+                    minX: 1,
+                    maxX: 5,
                     minY: 0,
                     maxY: 5,
+                    lineTouchData: LineTouchData(
+                      touchTooltipData: LineTouchTooltipData(
+                        getTooltipItems: (touchedSpots) {
+                          return touchedSpots.map(
+                            (touchedSpot) {
+                              return LineTooltipItem(touchedSpot.y.toString(), TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
+                            },
+                          ).toList();
+                        },
+                      ),
+                    ),
                     gridData: FlGridData(
                       show: true,
+                    ),
+                    titlesData: FlTitlesData(
+                      bottomTitles: SideTitles(
+                        showTitles: false,
+                      ),
+                      leftTitles: SideTitles(
+                        showTitles: true,
+                        getTextStyles: (value) => const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                     axisTitleData: FlAxisTitleData(
                       show: true,
@@ -104,11 +148,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
-                        margin: -30,
+                        margin: -10,
                         showTitle: true,
                       ),
                       bottomTitle: AxisTitle(
-                        titleText: "Målinger d. 29/04/2021",
+                        titleText: "Målinger d. 30/04/2021",
                         textStyle: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -132,11 +176,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     lineBarsData: [
                       LineChartBarData(
                         spots: [
-                          FlSpot(2, 4),
-                          FlSpot(5, 3),
-                          FlSpot(7, 2),
-                          FlSpot(8, 5),
-                          FlSpot(9, 4),
+                          FlSpot(1, 4),
+                          FlSpot(2, 3),
+                          FlSpot(3, 2),
+                          FlSpot(4, 5),
+                          FlSpot(5, 4),
                         ],
                         isCurved: true,
                         colors: [

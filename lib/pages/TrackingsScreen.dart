@@ -1,6 +1,7 @@
 import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
 import 'package:AlkometerApp/components/HeaderComponent.dart';
 import 'package:AlkometerApp/components/SquareComponent.dart';
+import 'package:AlkometerApp/components/TrackingComponent.dart';
 import 'package:flutter/material.dart';
 
 class TrackingScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     Container(
                       margin: EdgeInsets.only(top: 20.0),
                       child: Text(
-                        "Trackings:",
+                        "Trackings",
                         style: TextStyle(
                           fontSize: 25.0,
                         ),
@@ -40,21 +41,12 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       child: Container(
                         margin: EdgeInsets.only(top: 20.0),
                         child: ListView(
+                          physics: BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
                           children: [
-                            Container(
-                              height: 50,
-                              color: Colors.amber[600],
-                              child: const Center(child: Text('Entry A')),
-                            ),
-                            Container(
-                              height: 50,
-                              color: Colors.amber[500],
-                              child: const Center(child: Text('Entry B')),
-                            ),
-                            Container(
-                              height: 50,
-                              color: Colors.amber[100],
-                              child: const Center(child: Text('Entry C')),
+                            TrackingComponent(
+                              dateTracked: DateTime.now(),
+                              promille: 3.14,
                             ),
                           ],
                         ),

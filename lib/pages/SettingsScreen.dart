@@ -52,9 +52,7 @@ class _SettingScreenState extends State<SettingScreen> {
     enableBluetooth();
 
     // Listen for further state changes
-    FlutterBluetoothSerial.instance
-        .onStateChanged()
-        .listen((BluetoothState state) {
+    FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
       setState(() {
         _bluetoothState = state;
         if (globals.currentConnection != null) {
@@ -93,10 +91,7 @@ class _SettingScreenState extends State<SettingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            HeaderComponent(
-                icon: Icons.settings,
-                title: "Indstillinger",
-                color: Colors.green),
+            HeaderComponent(icon: Icons.settings, title: "Indstillinger", color: Colors.green),
             Container(
               margin: EdgeInsets.only(top: 25.0),
               child: SquareComponent(
@@ -106,7 +101,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       Container(
                         margin: EdgeInsets.only(top: 25.0),
                         child: Text(
-                          "Bluetooth Status:",
+                          "Bluetooth Status",
                           style: TextStyle(
                             fontSize: 25.0,
                           ),
@@ -123,11 +118,9 @@ class _SettingScreenState extends State<SettingScreen> {
                               onChanged: (bool value) {
                                 future() async {
                                   if (value) {
-                                    await FlutterBluetoothSerial.instance
-                                        .requestEnable();
+                                    await FlutterBluetoothSerial.instance.requestEnable();
                                   } else {
-                                    await FlutterBluetoothSerial.instance
-                                        .requestDisable();
+                                    await FlutterBluetoothSerial.instance.requestDisable();
                                   }
 
                                   await myBlue.getPairedDevices();
@@ -148,7 +141,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       Container(
                         margin: EdgeInsets.only(top: 20.0),
                         child: Text(
-                          "Paired Device:",
+                          "Paired Device",
                           style: TextStyle(
                             fontSize: 25.0,
                           ),
@@ -181,18 +174,35 @@ class _SettingScreenState extends State<SettingScreen> {
                           children: [
                             DropdownButton(
                               items: _getDeviceItems(),
-                              onChanged: (value) =>
-                                  setState(() => _device = value),
+                              onChanged: (value) => setState(() => _device = value),
                               value: _devicesList.isNotEmpty ? _device : null,
                             ),
                             ElevatedButton(
                               onPressed: _connected ? _disconnect : _connect,
-                              child:
-                                  Text(_connected ? 'Disconnect' : 'Connect'),
+                              child: Text(_connected ? 'Disconnect' : 'Connect'),
                             ),
                           ],
                         ),
                       ),
+                      Container(
+                        margin: EdgeInsets.only(top: 25.0),
+                        child: Text(
+                          "Data Managemen",
+                          style: TextStyle(
+                            fontSize: 25.0,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red, // background
+                          onPrimary: Colors.white, // foreground
+                        ),
+                        onPressed: () {
+                          print("Hi");
+                        },
+                        child: Text("Delete Data"),
+                      )
                     ],
                   ),
                 ),
@@ -235,7 +245,7 @@ class _SettingScreenState extends State<SettingScreen> {
           _connected = true;
         });
 
-        globals.currentConnection.input.listen(null).onDone(() {
+        /*globals.currentConnection.input.listen(null).onDone(() {
           if (isDisconnecting) {
             print('Disconnecting locally!');
           } else {
@@ -244,7 +254,7 @@ class _SettingScreenState extends State<SettingScreen> {
           if (this.mounted) {
             setState(() {});
           }
-        });
+        });*/
       }).catchError((error) {
         print('Cannot connect, exception occurred');
         print(error);

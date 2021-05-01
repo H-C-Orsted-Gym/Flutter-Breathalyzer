@@ -22,7 +22,7 @@ class SquareComponent extends StatelessWidget {
           ),
         ],
       ),
-      height: 500,
+      height: 555,
       width: 300,
       child: this.fillings,
     );
