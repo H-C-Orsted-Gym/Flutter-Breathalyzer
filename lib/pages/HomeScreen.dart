@@ -21,35 +21,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String result = "";
-  StreamController controller;
+
+  StreamSubscription<Uint8List> subscription;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     if (globals.currentConnection != null) {
-      controller.addStream(globals.currentConnection.input);
-
-      controller.stream.asBroadcastStream(
-        onListen: (subscription) {
-          subscription.onData((data) {
-            print(ascii.decode(data));
-            setState(() {
-              createRecord((double.parse(ascii.decode(data)) / 1000).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
-              this.result = (double.parse(ascii.decode(data)) / 1000).toString().trim();
-            });
-          });
-        },
-        onCancel: (subscription) {
-          print("Im done....");
-        },
-      );
-
-      /*subscription = globals.currentConnection.input.listen((data) {
-        //Data entry point
-        
-      });*/
+      subscription = globals.currentConnection.input.listen((data) {
+        print(ascii.decode(data));
+        setState(() {
+          createRecord((double.parse(ascii.decode(data)) / 1000).toStringAsExponential(2).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
+          this.result = (double.parse(ascii.decode(data)) / 1000).toStringAsExponential(2).toString().trim();
+        });
+      });
     }
 
     getLatestRecording();
@@ -57,10 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-
-    if (controller != null) {
-      controller.close();
+    if (subscription != null) {
+      subscription.cancel().then((value) {
+        print("Im done :)");
+      });
     }
 
     super.dispose();
