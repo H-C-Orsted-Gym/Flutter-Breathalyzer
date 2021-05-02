@@ -21,7 +21,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String result = "";
-
   StreamSubscription<Uint8List> subscription;
 
   @override
@@ -29,25 +28,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     if (globals.currentConnection != null) {
-      subscription = globals.currentConnection.input.listen((data) {
-        print(ascii.decode(data));
-        setState(() {
-          createRecord((double.parse(ascii.decode(data)) / 1000).toStringAsExponential(2).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
-          this.result = (double.parse(ascii.decode(data)) / 1000).toStringAsExponential(2).toString().trim();
-        });
+      subscription = globals.streamBT.listen((event) {
+        print(event);
       });
     }
+
+    //print(subscription);
 
     getLatestRecording();
   }
 
   @override
   void dispose() {
-    if (subscription != null) {
-      subscription.cancel().then((value) {
-        print("Im done :)");
-      });
-    }
+    print("Hi too u");
+
+    subscription.cancel();
 
     super.dispose();
   }

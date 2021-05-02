@@ -17,6 +17,7 @@ class BottomNavigationComponent extends StatelessWidget {
     TrackingScreen(),
     HomeScreen(),
     SettingScreen(),
+    HomeScreen(),
   ];
 
   void _onItemTapped(int index) {

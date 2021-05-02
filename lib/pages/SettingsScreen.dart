@@ -261,6 +261,7 @@ class _SettingScreenState extends State<SettingScreen> {
       await BluetoothConnection.toAddress(_device.address).then((_connection) {
         print('Connected to the device');
         globals.currentConnection = _connection;
+        globals.streamBT = globals.currentConnection.input.asBroadcastStream();
         setState(() {
           _connected = true;
         });
