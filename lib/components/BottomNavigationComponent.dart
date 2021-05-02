@@ -31,15 +31,15 @@ class BottomNavigationComponent extends StatelessWidget {
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.bar_chart),
-          label: 'Trackings',
+          label: 'Målinger',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          label: 'Home',
+          label: 'Hjem',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
-          label: 'Settings',
+          label: 'Indstillinger',
         ),
       ],
       currentIndex: this.currentPage,

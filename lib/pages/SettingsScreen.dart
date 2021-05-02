@@ -1,4 +1,5 @@
 import 'package:AlkometerApp/classes/BluetoothClass.dart';
+import 'package:AlkometerApp/classes/TrackingClass.dart';
 import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
 import 'package:AlkometerApp/components/HeaderComponent.dart';
 import 'package:AlkometerApp/components/SquareComponent.dart';
@@ -112,7 +113,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text("Enable Bluetooth:"),
+                            Text("Slå Bluetooth Til:"),
                             Switch(
                               value: _bluetoothState.isEnabled,
                               onChanged: (bool value) {
@@ -139,9 +140,9 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 20.0),
+                        margin: EdgeInsets.only(top: 10.0),
                         child: Text(
-                          "Paired Device",
+                          "Parret Enheder",
                           style: TextStyle(
                             fontSize: 25.0,
                           ),
@@ -158,7 +159,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             ),
                             children: <TextSpan>[
                               TextSpan(
-                                text: _connected ? "Connected" : "Disconnected",
+                                text: _connected ? "Tilsluttet" : "Frakoblet",
                                 style: TextStyle(
                                   color: _connected ? Colors.green : Colors.red,
                                   fontWeight: FontWeight.bold,
@@ -179,15 +180,15 @@ class _SettingScreenState extends State<SettingScreen> {
                             ),
                             ElevatedButton(
                               onPressed: _connected ? _disconnect : _connect,
-                              child: Text(_connected ? 'Disconnect' : 'Connect'),
+                              child: Text(_connected ? 'Frakoble' : 'Tilslut'),
                             ),
                           ],
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 25.0),
+                        margin: EdgeInsets.only(top: 10.0),
                         child: Text(
-                          "Data Managemen",
+                          "Køn & Vægt",
                           style: TextStyle(
                             fontSize: 25.0,
                           ),
@@ -199,10 +200,29 @@ class _SettingScreenState extends State<SettingScreen> {
                           onPrimary: Colors.white, // foreground
                         ),
                         onPressed: () {
-                          print("Hi");
+                          Tracking.instance.deleteAllRecords();
                         },
-                        child: Text("Delete Data"),
-                      )
+                        child: Text(
+                          "Delete Data",
+                          style: TextStyle(
+                            fontSize: 18.0,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.green, // background
+                          onPrimary: Colors.white, // foreground
+                        ),
+                        onPressed: () async {
+                          await Tracking.instance.insert({
+                            Tracking.columnDate: "01-05-2021 - 12:12",
+                            Tracking.columnData: "3.14",
+                          });
+                          print(Tracking.instance.database);
+                        },
+                        child: Text("Insert Data"),
+                      ),
                     ],
                   ),
                 ),

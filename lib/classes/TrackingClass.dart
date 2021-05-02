@@ -6,10 +6,10 @@ import 'package:path/path.dart';
 class Tracking {
   static final _dbName = "database.db";
   static final _dbVersion = 1;
-  static final _tableName = "Trackings";
-  static final _columnId = "Id";
-  static final _columnDate = "Date";
-  static final _columnData = "Data";
+  static final tableName = "Trackings";
+  static final columnId = "Id";
+  static final columnDate = "DateTracked";
+  static final columnData = "DataTracked";
 
   Tracking._privateConstructor();
   static final Tracking instance = Tracking._privateConstructor();
@@ -32,35 +32,44 @@ class Tracking {
   }
 
   Future _onCreate(Database db, int version) {
-    db.query('''
-        CREATE TABLE ${_tableName}( ${_columnId} INTEGER PRIMARY KEY,
-        ${_columnDate} VARCHAR(255) NOT NULL,
-        ${_columnData} VRACHAR (255) NOT NULL
-        
-        )
-      ''');
+    db.rawQuery("""
+        CREATE TABLE ${tableName} (
+          ${columnId} int PRIMARY KEY,
+          ${columnDate} varchar(255),
+          ${columnData} varchar(255)
+        );
+      """);
   }
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.insert(_tableName, row);
-  }
-
-  Future<List<Map<String, dynamic>>> queryAll() async {
-    Database db = await instance.database;
-    return await db.query(_tableName);
-  }
-
-  Future<int> update(Map<String, dynamic> row) async {
-    Database db = await instance.database;
-
-    int id = row[_columnId];
-
-    return await db.update(_tableName, row, where: "${_columnId}=?", whereArgs: [id]);
+    return await db.insert(tableName, row);
   }
 
   Future<int> delete(int id) async {
     Database db = await instance.database;
-    return await db.delete(_tableName, where: "${_columnId}=?", whereArgs: [id]);
+    return await db.delete(tableName, where: "${columnId}=?", whereArgs: [id]);
+  }
+
+  void deleteAllRecords() async {
+    Database db = await instance.database;
+    db.execute("DELETE FROM ${tableName}");
+  }
+
+  Future<List<Map<String, Object>>> getRecords() async {
+    Database db = await instance.database;
+
+    List<Map<String, Object>> result = await db.rawQuery("SELECT * FROM ${tableName} ORDER BY Id ASC");
+
+    return result;
+  }
+
+  Future<List<Map<String, Object>>> getLatestSample() async {
+    Database db = await instance.database;
+
+    List<Map<String, Object>> result = await db.rawQuery("SELECT * FROM ${tableName} ORDER BY Id DESC LIMIT 1");
+    //double sampleResult = double.parse(result[0]["Data"]);
+
+    return result;
   }
 }

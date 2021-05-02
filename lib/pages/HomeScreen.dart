@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:AlkometerApp/classes/TrackingClass.dart';
 import 'package:AlkometerApp/components/BottomNavigationComponent.dart';
 import 'package:AlkometerApp/components/BreakLineComponent.dart';
 import 'package:AlkometerApp/components/CircleComponent.dart';
@@ -8,6 +10,7 @@ import 'package:AlkometerApp/components/HeaderComponent.dart';
 import 'package:AlkometerApp/globals.dart' as globals;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -18,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String result = "";
+  StreamController controller;
 
   @override
   void initState() {
@@ -25,14 +29,60 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     if (globals.currentConnection != null) {
-      globals.currentConnection.input.listen((Uint8List data) {
+      controller.addStream(globals.currentConnection.input);
+
+      controller.stream.asBroadcastStream(
+        onListen: (subscription) {
+          subscription.onData((data) {
+            print(ascii.decode(data));
+            setState(() {
+              createRecord((double.parse(ascii.decode(data)) / 1000).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
+              this.result = (double.parse(ascii.decode(data)) / 1000).toString().trim();
+            });
+          });
+        },
+        onCancel: (subscription) {
+          print("Im done....");
+        },
+      );
+
+      /*subscription = globals.currentConnection.input.listen((data) {
         //Data entry point
-        print(ascii.decode(data));
-        setState(() {
-          this.result = ascii.decode(data).toString().trim();
-        });
-      });
+        
+      });*/
     }
+
+    getLatestRecording();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    if (controller != null) {
+      controller.close();
+    }
+
+    super.dispose();
+  }
+
+  void getLatestRecording() async {
+    List<Map<String, Object>> trackingResult = await Tracking.instance.getLatestSample();
+
+    setState(() {
+      if (trackingResult.isNotEmpty) {
+        result = trackingResult[0]["DataTracked"];
+      } else {
+        result = "0.0";
+      }
+    });
+  }
+
+  void createRecord(String promille, String dateTracked) async {
+    await Tracking.instance.insert({
+      Tracking.columnDate: dateTracked,
+      Tracking.columnData: promille,
+    });
   }
 
   @override

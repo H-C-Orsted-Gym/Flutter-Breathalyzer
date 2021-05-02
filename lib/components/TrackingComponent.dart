@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 class TrackingComponent extends StatelessWidget {
   int id;
   double promille;
-  DateTime dateTracked;
+  String dateTracked;
 
   TrackingComponent({
     @required this.id,
