@@ -28,8 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     if (globals.currentConnection != null) {
-      subscription = globals.streamBT.listen((event) {
-        print(event);
+      subscription = globals.streamBT.listen((data) {
+        print(ascii.decode(data));
+        setState(() {
+          createRecord((double.parse(ascii.decode(data)) / 1000).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
+          this.result = (double.parse(ascii.decode(data)) / 1000).toString().trim();
+        });
       });
     }
 
