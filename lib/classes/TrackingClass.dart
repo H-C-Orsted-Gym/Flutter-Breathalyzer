@@ -33,22 +33,23 @@ class Tracking {
 
   Future _onCreate(Database db, int version) {
     db.rawQuery("""
-        CREATE TABLE ${tableName} (
-          ${columnId} int PRIMARY KEY,
-          ${columnDate} varchar(255),
-          ${columnData} varchar(255)
-        );
+              CREATE TABLE ${tableName} (
+                ${columnId} INTEGER PRIMARY KEY,
+                ${columnDate} varchar(255),
+                ${columnData} varchar(255)
+              );
       """);
   }
 
-  Future<int> insert(Map<String, dynamic> row) async {
+  Future<int> insert(String data, String date) async {
     Database db = await instance.database;
-    return await db.insert(tableName, row);
+
+    db.execute("INSERT INTO ${tableName} (${columnData}, ${columnDate}) VALUES ('${data}', '${date}');");
   }
 
-  Future<int> delete(int id) async {
+  void delete(int id) async {
     Database db = await instance.database;
-    return await db.delete(tableName, where: "${columnId}=?", whereArgs: [id]);
+    db.execute("DELETE FROM ${tableName} WHERE ${columnId}=${id}");
   }
 
   void deleteAllRecords() async {

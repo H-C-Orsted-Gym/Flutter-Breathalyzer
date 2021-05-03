@@ -16,6 +16,7 @@ class TrackingList extends StatelessWidget {
       return ListView.builder(
         itemCount: data.length,
         itemBuilder: (context, index) {
+          print(data[index]);
           return TrackingComponent(
             id: data[index]["Id"],
             promille: double.parse(data[index]["DataTracked"]),

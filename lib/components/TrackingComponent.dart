@@ -1,4 +1,5 @@
 import 'package:AlkometerApp/classes/TrackingClass.dart';
+import 'package:AlkometerApp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -83,7 +84,7 @@ class TrackingComponent extends StatelessWidget {
                         children: [
                           TextSpan(
                             //text: '${this.dateTracked.day}/${this.dateTracked.month}/${this.dateTracked.year} - ${this.dateTracked.hour}:${this.dateTracked.minute}',
-                            text: DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()),
+                            text: this.dateTracked,
                             style: TextStyle(
                               fontWeight: FontWeight.normal,
                             ),
@@ -102,7 +103,10 @@ class TrackingComponent extends StatelessWidget {
                 color: Colors.lightBlue,
               ),
               onTap: () {
+                print("Tapped on : " + this.id.toString());
                 Tracking.instance.delete(this.id);
+
+                showMessage(context, "Deleted record.");
 
                 /*
 

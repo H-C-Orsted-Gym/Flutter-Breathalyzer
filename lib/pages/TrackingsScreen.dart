@@ -5,6 +5,7 @@ import 'package:AlkometerApp/components/LoadingComponent.dart';
 import 'package:AlkometerApp/components/SquareComponent.dart';
 import 'package:AlkometerApp/components/TrackingComponent.dart';
 import 'package:AlkometerApp/components/TrackingList.dart';
+import 'package:AlkometerApp/main.dart';
 import 'package:flutter/material.dart';
 
 class TrackingScreen extends StatefulWidget {
@@ -53,12 +54,36 @@ class _TrackingScreenState extends State<TrackingScreen> {
                   fillings: Column(
                     children: [
                       Container(
-                        margin: EdgeInsets.only(top: 20.0),
-                        child: Text(
-                          "Trackings",
-                          style: TextStyle(
-                            fontSize: 25.0,
-                          ),
+                        padding: EdgeInsets.only(top: 20.0),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                child: Text(
+                                  "Trackings",
+                                  style: TextStyle(
+                                    fontSize: 25.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                margin: EdgeInsets.only(right: 35, top: 5.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      print("reloaded...");
+                                      Navigator.of(context).pushReplacement(createRoute(TrackingScreen()));
+                                    });
+                                  },
+                                  child: Icon(Icons.replay),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Expanded(

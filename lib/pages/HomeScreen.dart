@@ -32,9 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
       subscription = globals.streamBT.listen((data) {
         print(ascii.decode(data));
         setState(() {
+          print(DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
           createRecord((double.parse(ascii.decode(data)) / 1000).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
 
-          double hours = (double.parse(ascii.decode(data)) / 0.15);
+          double hours = ((double.parse(ascii.decode(data)) / 1000) / 0.15);
 
           Map<dynamic, dynamic> formattedTime = formatMinutes(hours * 60);
 
@@ -96,10 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void createRecord(String promille, String dateTracked) async {
-    await Tracking.instance.insert({
-      Tracking.columnDate: dateTracked,
-      Tracking.columnData: promille,
-    });
+    await Tracking.instance.insert(promille, dateTracked);
   }
 
   @override

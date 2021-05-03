@@ -215,10 +215,10 @@ class _SettingScreenState extends State<SettingScreen> {
                           onPrimary: Colors.white, // foreground
                         ),
                         onPressed: () async {
-                          await Tracking.instance.insert({
-                            Tracking.columnDate: "01-05-2021 - 12:12",
-                            Tracking.columnData: "3.14",
-                          });
+                          await Tracking.instance.insert(
+                            "3.14",
+                            "01-05-2021 - 12:12",
+                          );
                           print(Tracking.instance.database);
                         },
                         child: Text("Insert Data"),
