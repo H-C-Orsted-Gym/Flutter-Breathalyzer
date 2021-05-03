@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     minX: 0,
                     maxX: this.maxGraphLength - 1,
                     minY: 0,
-                    maxY: 5,
+                    maxY: 1,
                     lineTouchData: LineTouchData(
                       touchTooltipData: LineTouchTooltipData(
                         getTooltipItems: (touchedSpots) {
@@ -265,6 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       LineChartBarData(
                         spots: records,
                         isCurved: true,
+                        curveSmoothness: 0.3,
                         colors: [
                           Colors.white,
                         ],

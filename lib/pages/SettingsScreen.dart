@@ -187,30 +187,26 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        child: Text(
-                          "Køn & Vægt",
-                          style: TextStyle(
-                            fontSize: 25.0,
+                        margin: EdgeInsets.only(
+                          top: 50.0,
+                        ),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.red, // background
+                            onPrimary: Colors.white, // foreground
+                          ),
+                          onPressed: () {
+                            Tracking.instance.deleteAllRecords();
+                          },
+                          child: Text(
+                            "Delete Data",
+                            style: TextStyle(
+                              fontSize: 18.0,
+                            ),
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.red, // background
-                          onPrimary: Colors.white, // foreground
-                        ),
-                        onPressed: () {
-                          Tracking.instance.deleteAllRecords();
-                        },
-                        child: Text(
-                          "Delete Data",
-                          style: TextStyle(
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
+                      /*ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Colors.green, // background
                           onPrimary: Colors.white, // foreground
@@ -223,7 +219,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           print(Tracking.instance.database);
                         },
                         child: Text("Insert Data"),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
