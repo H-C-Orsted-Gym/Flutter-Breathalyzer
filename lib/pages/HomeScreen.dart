@@ -21,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String result = "";
+  String timeLeft = "";
   StreamSubscription<Uint8List> subscription;
 
   @override
@@ -32,6 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
         print(ascii.decode(data));
         setState(() {
           createRecord((double.parse(ascii.decode(data)) / 1000).toString(), DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString());
+
+          double hours = (double.parse(ascii.decode(data)) / 0.15);
+
+          Map<dynamic, dynamic> formattedTime = formatMinutes(hours * 60);
+
+          this.timeLeft = formattedTime["Hours"].toString() + " timer, " + formattedTime["Minutes"].toString() + " min.";
+
           this.result = (double.parse(ascii.decode(data)) / 1000).toString().trim();
         });
       });
@@ -46,7 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     print("Hi too u");
 
-    subscription.cancel();
+    if (subscription != null) {
+      subscription.cancel();
+    }
 
     super.dispose();
   }
@@ -57,10 +67,32 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       if (trackingResult.isNotEmpty) {
         result = trackingResult[0]["DataTracked"];
+
+        double hours = (double.parse(result) / 0.15);
+
+        Map<dynamic, dynamic> formattedTime = formatMinutes(hours * 60);
+
+        //print(formattedTime["Minutes"]);
+
+        this.timeLeft = formattedTime["Hours"].toString() + " timer, " + formattedTime["Minutes"].toString() + " min.";
       } else {
         result = "0.0";
       }
     });
+  }
+
+  Map<dynamic, dynamic> formatMinutes(double inputMinutes) {
+    var result = {};
+
+    List<String> timeSplitted = (inputMinutes / 60).toString().split(".");
+
+    int hours = int.parse(timeSplitted[0]);
+    int minutes = (double.parse("0." + timeSplitted[1]) * 60).round();
+
+    result["Hours"] = hours;
+    result["Minutes"] = minutes;
+
+    return result;
   }
 
   void createRecord(String promille, String dateTracked) async {
@@ -125,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      "52 min",
+                      this.timeLeft,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 35.0,
