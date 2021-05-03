@@ -23,6 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String result = "";
   String timeLeft = "";
   StreamSubscription<Uint8List> subscription;
+  List<FlSpot> records;
+  double maxGraphLength = 0.0;
 
   @override
   void initState() {
@@ -49,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //print(subscription);
 
     getLatestRecording();
+    getDailyRecords();
   }
 
   @override
@@ -94,6 +97,26 @@ class _HomeScreenState extends State<HomeScreen> {
     result["Minutes"] = minutes;
 
     return result;
+  }
+
+  void getDailyRecords() async {
+    List<Map<String, Object>> trackingResult = await Tracking.instance.getDailyRecords();
+
+    print(trackingResult);
+
+    List<FlSpot> points = [];
+
+    for (var i = 0; i < trackingResult.length; i++) {
+      print(trackingResult[i]["DateTracked"]);
+      FlSpot temp = FlSpot(double.parse(i.toString()), double.parse(trackingResult[i]["DataTracked"]));
+
+      points.add(temp);
+    }
+
+    setState(() {
+      records = points;
+      this.maxGraphLength = double.parse(trackingResult.length.toString());
+    });
   }
 
   void createRecord(String promille, String dateTracked) async {
@@ -176,8 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 300,
                 child: LineChart(
                   LineChartData(
-                    minX: 1,
-                    maxX: 5,
+                    minX: 0,
+                    maxX: this.maxGraphLength - 1,
                     minY: 0,
                     maxY: 5,
                     lineTouchData: LineTouchData(
@@ -217,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         showTitle: true,
                       ),
                       bottomTitle: AxisTitle(
-                        titleText: "Målinger d. 30/04/2021",
+                        titleText: "Målinger d. " + DateFormat('dd/MM/yyyy').format(DateTime.now()),
                         textStyle: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -240,13 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     lineBarsData: [
                       LineChartBarData(
-                        spots: [
-                          FlSpot(1, 4),
-                          FlSpot(2, 3),
-                          FlSpot(3, 2),
-                          FlSpot(4, 5),
-                          FlSpot(5, 4),
-                        ],
+                        spots: records,
                         isCurved: true,
                         colors: [
                           Colors.white,

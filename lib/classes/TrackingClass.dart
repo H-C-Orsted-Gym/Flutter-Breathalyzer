@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -70,6 +71,18 @@ class Tracking {
 
     List<Map<String, Object>> result = await db.rawQuery("SELECT * FROM ${tableName} ORDER BY Id DESC LIMIT 1");
     //double sampleResult = double.parse(result[0]["Data"]);
+
+    return result;
+  }
+
+  Future<List<Map<String, Object>>> getDailyRecords() async {
+    Database db = await instance.database;
+
+    String date = DateFormat('dd/MM/yyyy').format(DateTime.now());
+
+    print(date);
+
+    List<Map<String, Object>> result = await db.rawQuery("SELECT * FROM ${tableName} WHERE ${columnDate} LIKE '%${date}%';");
 
     return result;
   }

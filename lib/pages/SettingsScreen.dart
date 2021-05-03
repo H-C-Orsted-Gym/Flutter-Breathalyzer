@@ -7,6 +7,7 @@ import 'package:AlkometerApp/main.dart';
 import 'package:AlkometerApp/globals.dart' as globals;
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:intl/intl.dart';
 
 class SettingScreen extends StatefulWidget {
   SettingScreen({Key key}) : super(key: key);
@@ -217,7 +218,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         onPressed: () async {
                           await Tracking.instance.insert(
                             "3.14",
-                            "01-05-2021 - 12:12",
+                            DateFormat('dd/MM/yyyy – kk:mm').format(DateTime.now()).toString(),
                           );
                           print(Tracking.instance.database);
                         },
